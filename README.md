@@ -1,4 +1,4 @@
-# Rome S5P High-Resolution Pollutants Dataset
+**Rome S5P High-Resolution Pollutants Dataset**
 
 This repository contains code, input data references, and final datasets associated with a reproducible workflow for generating high-resolution, spatially continuous atmospheric pollutant data derived from Sentinel-5P (TROPOMI) over the Rome metropolitan area.
 
@@ -6,7 +6,7 @@ The workflow relies exclusively on open-access satellite, climatic, and ancillar
 
 ---
 
-## Repository structure
+**Repository structure**
 
 The repository is organised as follows:
 
@@ -21,72 +21,107 @@ rome-s5p-high-resolution-pollutants/
 │ │ └── industrial_density/
 │ ├── environmental_variables/
 │ └── pollutants/
-└── scripts/
+├── scripts/
+│   ├── S5P_gapfill_downscale_clean.js
+│   ├── S5P_gapfill_downscale_debug.js
+│   ├── S5P_overpass_time_selector.js
+│   └── imports_example.js
 
 ---
 
-## Data description
-## Data format and spatial reference
+**Data description**
 
-All datasets used as predictors and generated through the presented workflow are provided in **GeoTIFF format**, projected in the **World Geodetic System 1984 (EPSG:4326)**.
+Each daily archive contains:
 
-### `data/input_static/`
-This folder contains static spatial layers used as ancillary predictors in the workflow:
-- **study_area/**: area of interest (Rome metropolitan area)
-- **dem/**: Digital Elevation Model (TINITALY)
-- **road_density/**: road network density derived from OpenStreetMap
-- **industrial_density/**: industrial buildings and areas derived from OpenStreetMap
+raw Sentinel-5P pollutant column data (NO₂, SO₂, CO) at native resolution (~3.5 × 7 km),
 
----
+gap-filled and downscaled pollutant maps at 500 m spatial resolution,
 
-### `data/environmental_variables/`
-This folder contains environmental and meteorological variables (e.g. ERA5-Land, CHIRPS, NDVI) used as predictors.
+ancillary explanatory variables (meteorological, morphological, anthropogenic) provided both at native resolution and harmonized to 500 m.
 
-### `data/pollutants/`
-This folder contains Sentinel-5P atmospheric pollutant data (e.g. NO₂, SO₂, CO).
+All raster datasets are provided in GeoTIFF format, projected in WGS84 (EPSG:4326).
 
-Data are provided as **daily compressed archives**, each including both raw and downscaled products for the same acquisition date.
 
-## Daily data organisation
 
-Data are organised as **daily compressed ZIP archives**, each corresponding to a single date of acquisition or reference day.
+**File naming convention**
 
-Each daily archive may contain:
+Daily files follow this convention:
 
-- daily atmospheric pollutant maps for **NO₂, SO₂, and CO** over the Rome metropolitan area at the native Sentinel-5P spatial resolution (approximately **3.5 × 7 km**);
-- daily atmospheric pollutant maps for **NO₂, SO₂, and CO** at **500 m spatial resolution**, spatially continuous and gap-filled;
-- ancillary explanatory variables (meteorological, morphological, and anthropogenic), provided as **multiband rasters** at their original resolution and harmonised and regridded to the same spatial scale used for pollutant data manipulation.
+ERA5_CHIRPS_raw_YYYYMMDD.tif
 
----
+ERA5_CHIRPS_500m_downscaled_YYYYMMDD.tif
 
-## Scripts
+P_column_raw_YYYYMMDD.tif
 
-### `scripts/`
-## Scripts
+P_column_500m_gapfilled_YYYYMMDD.tif
 
-The downscaling of meteorological variables and the gap-filling and spatial downscaling of atmospheric pollutant data were performed using **Google Earth Engine (GEE) (JavaScript API)**.
+where P is replaced by the pollutant name (NO2, SO2, CO) and YYYYMMDD indicates the acquisition date.
 
-The scripts implementing these processes for **SO₂, NO₂, and CO** are available in the `scripts/` directory of this repository. These scripts handle data acquisition, preprocessing, gap-filling, spatial downscaling, and export of the final products.
+Files are compressed into daily ZIP archives to reduce storage size.
 
-In addition, the repository includes a dedicated script used to identify the optimal **Sentinel-5P overpass time** over the study area. This script selects the raster acquisition with the highest number of valid (non-NoData) pixels and provides the corresponding time window to be used as input in the main processing workflow. The same script also returns the total number of valid pixels within the selected area of interest.
 
----
 
-## License
+**Scripts**
 
-This repository is released under the **Creative Commons Attribution 4.0 International (CC BY 4.0)** license.  
-See the `LICENSE` file for details.
+The scripts folder contains all Google Earth Engine code used to generate and validate the dataset:
 
----
+S5P_gapfill_downscale_clean.js
+Clean, publication-ready version of the workflow used for:
 
-## Citation
+meteorological data downscaling,
 
-If you use this dataset or the associated code, please cite the related data paper:
+Sentinel-5P gap-filling and spatial downscaling to 500 m,
 
-> *[Citation will be added upon publication]*
+export of final raster products and validation tables.
 
----
+S5P_gapfill_downscale_debug.js
+Extended debug version including:
 
-## Notes
+diagnostic prints,
+
+map visualizations,
+
+intermediate checks useful for testing, inspection, and adaptation of the workflow.
+
+S5P_overpass_time_selector.js
+Utility script used to identify the optimal Sentinel-5P overpass time over the study area by maximizing the number of valid pixels, providing the time window used as input for the main workflow.
+
+imports_example.js
+Example file illustrating the required Google Earth Engine imports (study area, static variables, DEM).
+Since GEE asset paths are user-specific, users must upload the corresponding datasets to their own GEE accounts and update asset paths accordingly.
+
+
+
+**Requirements**
+
+To run the scripts, users need:
+
+a Google Earth Engine account,
+
+uploaded assets corresponding to:
+
+study area geometry,
+
+road density raster,
+
+industrial density raster,
+
+digital elevation model (DEM).
+
+An example of the required imports is provided in imports_example.js.
+
+
+
+**License**
+
+All data and code in this repository are released under the CC0 1.0 Universal (Public Domain Dedication) license, unless otherwise specified.
+
+
+
+**Citation**
+
+If you use this dataset or code, please cite the associated data paper (to be added upon publication).
+
+**Notes**
 
 This dataset is intended to support spatial analyses of atmospheric pollutant distributions at the urban scale and applications in environmental monitoring and cultural heritage studies. Satellite-derived products should be interpreted considering their physical meaning and spatial representativeness.
